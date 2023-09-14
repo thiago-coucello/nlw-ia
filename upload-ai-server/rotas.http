@@ -1,0 +1,37 @@
+# @name get-prompts
+GET http://localhost:3333/prompts
+
+###
+
+# @name get-prompts
+POST http://localhost:3333/videos
+Content-Type: multipart/form-data; boundary=----WebkitFormBoundary7MA4YWxkTrZu0gW
+
+------WebkitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="file"; filename="example.mp3"
+Content-Type: audio/mpeg
+
+.\example.mp3
+------WebkitFormBoundary7MA4YWxkTrZu0gW--
+
+###
+
+# @name create-transcription
+POST http://localhost:3333/videos/1e237edd-5327-4109-8257-ded16b62991e/transcription
+Content-Type: application/json
+
+{
+  "prompt": "Trabalho, Configuração, Filiais.dbf, Empresas"
+}
+
+###
+
+# @name generate-ai-completion
+POST http://localhost:3333/ai/complete
+Content-Type: application/json
+
+{
+  "id": "1e237edd-5327-4109-8257-ded16b62991e",
+  "template": "Gere um resumo sucinto da transcrição do vídeo informado a seguir: '''{transcription}'''"
+}
+
