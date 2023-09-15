@@ -1,12 +1,33 @@
-import { FileVideo, Github, Upload, Wand2 } from "lucide-react"
+import { Github } from "lucide-react"
 import { Button } from "./components/ui/button";
 import { Separator } from "./components/ui/separator";
 import { Textarea } from "./components/ui/textarea";
-import { Label } from "./components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./components/ui/select";
-import { Slider } from "./components/ui/slider";
+import { VideoInputForm } from "./components/videoInputForm";
+import { GenerationInputForm } from "./components/generationInputForm";
+import { useState } from "react";
+import { useCompletion } from "ai/react"
 
 export function App() {
+  const [videoId, setVideoId] = useState<string | null>(null);
+  const [temperature, setTemperature] = useState(0.5);
+
+  const {
+    input,
+    setInput,
+    handleInputChange,
+    handleSubmit
+  } = useCompletion({
+    api: "http://localhost:3333/ai/complete",
+    body: {
+      id: videoId,
+      temperature,
+      prompt
+    },
+    headers: {
+      "Content-Type": "application/json"
+    }
+  })
+
   return (
     <div className="min-h-screen flex flex-col">
       <div className="px-6 py-3 flex items-center justify-between border-b">
@@ -30,6 +51,8 @@ export function App() {
             <Textarea 
               className="resize-none p-4 leading-relaxed"
               placeholder="Inclua o prompt para a IA..."
+              value={input}
+              onChange={handleInputChange}
             />
             <Textarea 
               className="resize-none p-4 leading-relaxed"
@@ -43,91 +66,17 @@ export function App() {
           </p>
         </div>
         <aside className="w-80 space-y-6">
-          <form className="space-y-6">
-            <label 
-              htmlFor="video"
-              className="border flex rounded-md aspect-video cursor-pointer border-dashed text-sm flex-col gap-2 items-center justify-center text-muted-foreground hover:bg-primary/20"
-            >
-              <FileVideo className="w-4 h-4"/>
-              Selecione um vídeo
-            </label>
-
-            <input type="file" id="video" accept="video/mp4" className="sr-only" />
-            
-            <Separator />
-
-            <div className="space-y-2">
-              <Label htmlFor="transcription_prompt">Prompt de transcrição</Label>
-              <Textarea 
-                id="transcription_prompt" 
-                className="h-20 leading-relaxed resize-none"
-                placeholder="Inclua palavras-chave mencionadas no vídeo separadas por vírgula (,)"
-              />
-            </div>
-
-            <Button type="submit" className="w-full">
-              <Upload className="w-4 h-4 mr-2"/>
-              Carregar vídeo
-            </Button>
-          </form>
+          <VideoInputForm onVideoUploaded={setVideoId}/>
 
           <Separator />
 
-          <form className="space-y-6">
-            <div className="space-y-2">
-              <Label>Prompt</Label>
+          <GenerationInputForm 
+            onSubmit={handleSubmit} 
+            onPromptSelected={setInput} 
+            temperature={temperature} 
+            setTemperature={setTemperature}
+          />
 
-              <Select>
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecione um prompt..."/>
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="title">Título do youtube</SelectItem>
-                  <SelectItem value="description">Descrição do youtube</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Modelo</Label>
-
-              <Select disabled defaultValue="gpt3.5">
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="gpt3.5">GPT 3.5-turbo 16k</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <span className="block text-xs text-muted-foreground italic">
-                Você poderá customizar essa opção em breve
-              </span>
-            </div>
-
-            <Separator />
-
-            <div className="space-y-4">
-              <Label>Temperatura</Label>
-
-              <Slider 
-                min={0}
-                max={1}
-                step={0.01}
-              />
-
-              <span className="block text-xs text-muted-foreground italic">
-                Valores mais altos tendem a deixar o valor mais criativo e mais suscetíveis a erros
-              </span>
-            </div>
-
-            <Separator />
-
-            <Button type="submit" className="w-full">
-              <Wand2 className="w-4 h-4 mr-2"/>
-              Executar
-            </Button>
-          </form>
         </aside>
       </main>
     </div>
