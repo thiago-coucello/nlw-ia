@@ -1,4 +1,4 @@
-import { Github } from "lucide-react"
+import { Github, Moon, Sun } from "lucide-react"
 import { Button } from "./components/ui/button";
 import { Separator } from "./components/ui/separator";
 import { Textarea } from "./components/ui/textarea";
@@ -6,10 +6,12 @@ import { VideoInputForm } from "./components/videoInputForm";
 import { GenerationInputForm } from "./components/generationInputForm";
 import { useState } from "react";
 import { useCompletion } from "ai/react"
+import { useTheme } from "./theme/themeProvider";
 
 export function App() {
   const [videoId, setVideoId] = useState<string | null>(null);
   const [temperature, setTemperature] = useState(0.5);
+  const { theme, setTheme } = useTheme();
 
   const {
     input,
@@ -41,6 +43,19 @@ export function App() {
           <Button variant="outline">
             <Github className="w-4 h-4 mr-2"/>
             GitHub
+          </Button>
+
+          <Button 
+            onClick={() => {
+              theme === "light" ? setTheme("dark") : setTheme("light")
+            }} 
+            variant="outline"
+          >
+            {theme === "light" ? (
+              <Moon className="fill-primary text-primary"/>
+            ) : (
+              <Sun className="fill-primary text-primary" />
+            )}
           </Button>
         </div>
       </div>
